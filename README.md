@@ -72,9 +72,66 @@ Automatically act on your data and communicate using third-party services like T
 
 # PROGRAM:
 
+    #include"ThingSpeak.h"
+    #include <WiFi.h>
+    #include "DHT.h"
+    
+    char ssid[]="Sona's A35";
+    char pass[]="Sona@1011";
+    
+    const int t=25;
+    WiFiClient client;
+    DHT dht(25, DHT11);
+    
+    unsigned long myChannelField = 2759181;
+    const int ChannelField1 = 1 ; 
+    const int ChannelField2 = 2 ;
+    const char *myWriteAPIKey="E9U6UMA0U1WYL76I";
+    
+    void setup()
+    {
+      Serial.begin(115200);
+      pinMode (t,OUTPUT);
+      WiFi.mode(WIFI_STA);
+      ThingSpeak.begin(client);
+      dht.begin();
+      delay(1000);
+    }
+    
+    void loop()
+    {
+      if(WiFi.status()!=WL_CONNECTED)
+      {
+        Serial.print("Attempting to connet to SSID: "); 
+        Serial.println(ssid);
+        while(WiFi.status() != WL_CONNECTED)
+        {
+          WiFi.begin(ssid, pass);
+          Serial.print(".");
+          delay(5000);
+        }
+        Serial.println("\nConnected");
+      }
+      float temperature = dht.readTemperature();
+      float humidity = dht.readHumidity();
+      delay(1000);
+      Serial.print("Temperature: ");
+      Serial.print(temperature);
+      Serial.println(" *C");
+      ThingSpeak.writeField(myChannelField, ChannelField1, temperature, myWriteAPIKey);
+      Serial.print("Humidity: ");
+      Serial.print(humidity);
+      Serial.println(" g.m-3");
+      ThingSpeak.writeField(myChannelField, ChannelField2, humidity, myWriteAPIKey);
+      delay(1000);
+    }
+
 # CIRCUIT DIAGRAM:
+![Uploading 397898741-c5895f80-f8f8-4277-aa31-e4cfccdb74e7.png…]()
 
 # OUTPUT:
+![397898220-9719ebe6-9af6-4863-ac61-cf727a12c1bd](https://github.com/user-attachments/assets/8a349015-70a0-4c46-bd71-9e20d1f38487)
+
 
 # RESULT:
 
